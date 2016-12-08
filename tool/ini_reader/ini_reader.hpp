@@ -1,14 +1,14 @@
-#pragma once
+ï»¿#pragma once
 
 /*
-	iniÎÄ¼ş¼òµ¥¶ÁÈ¡¹¤¾ß
-	Ö§³ÖÀàĞÍ
+	iniæ–‡ä»¶ç®€å•è¯»å–å·¥å…·
+	æ”¯æŒç±»å‹
 		int
 		string
-	Ê¹ÓÃ·½·¨:
-		NAP::INIReader::Read(ÎÄ¼şÂ·¾¶, ÊôĞÔÀàĞÍ, ÊôĞÔkey, Êä³öÊôĞÔÒıÓÃÖµ)
-		·µ»Ø
-			ÊÇ·ñ³É¹¦
+	ä½¿ç”¨æ–¹æ³•:
+		NAP::INIReader::Read(æ–‡ä»¶è·¯å¾„, å±æ€§ç±»å‹, å±æ€§key, è¾“å‡ºå±æ€§å¼•ç”¨å€¼)
+		è¿”å›
+			æ˜¯å¦æˆåŠŸ
  */
 
 #include <string>
@@ -27,7 +27,7 @@ namespace NAP
 	private:
 		enum
 		{
-			INIReader_BUFF_LENGTH = 255, // Ã¿ĞĞÊı¾İ¶ÁÈ¡³¤¶È
+			INIReader_BUFF_LENGTH = 255, // æ¯è¡Œæ•°æ®è¯»å–é•¿åº¦
 		};
 	};
 
@@ -67,7 +67,7 @@ namespace NAP
 			data = buff;
 			if (((pos1 = data.find_first_of("[")) != std::string::npos) && (pos2 = data.find_first_of("]")) != std::string::npos)
 				appNameNow = data.substr(pos1 + 1, pos2 - pos1 - 1);
-			else if ((appNameNow == appName) && ((pos1 = data.find_first_of("=")) != std::string::npos) && (data.substr(0, pos1) == baseName)) // appName²»Í¬¾Í²»ĞèÒªÅĞ¶ÏÁË
+			else if ((appNameNow == appName) && ((pos1 = data.find_first_of("=")) != std::string::npos) && (data.substr(0, pos1) == baseName)) // appNameä¸åŒå°±ä¸éœ€è¦åˆ¤æ–­äº†
 			{
 				out = data.substr(pos1 + 1).c_str();
 				in.close();
