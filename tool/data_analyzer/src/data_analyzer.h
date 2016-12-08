@@ -11,6 +11,7 @@ private:
 	std::string _TypeToInit(std::string type); // 转换类型的初始值
 	std::string _NameToMember(std::string name); // 属性转为成员属性名
 	std::string _ClassToMgr(std::string className); // 类名转为类管理名
+	std::string _FileToClass(std::string fileName); // 文件名转化类名
 
 private:
 	std::string m_pathConfig; // 配置文件路径

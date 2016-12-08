@@ -29,4 +29,5 @@ A csv-based independent cli game frame.
 - [x] 配置表解析类生成工具
 - [x] 配置表解析读取
 - [x] 配置文件读取
+- [x] 事件机制
 - [ ] 数据存储支持

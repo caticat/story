@@ -1,0 +1,4 @@
+﻿<row comment="主体">
+	<col type="int" name="id" comment="索引" />
+	<col type="string" name="message" comment="对话" />
+</row>

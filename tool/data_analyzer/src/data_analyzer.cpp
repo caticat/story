@@ -53,8 +53,7 @@ bool DataAnalyzer::Analyze()
 			cerr << "DataAnalyzer::Analyze className empty:pathXml:" << pathXml << endl;
 			return false;
 		}
-		className = fileName;
-		((char*)className.c_str())[0] = toupper(((char*)className.c_str())[0]); // 类名首字母大写
+		className = _FileToClass(fileName);
 		pathHpp = pathOut + "/" + fileName + ".hpp";
 		classKeyType = "";
 		classKeyValue = "";
@@ -229,6 +228,42 @@ bool DataAnalyzer::Analyze()
 		out.close();
 	}
 
+	// 生成总体管理
+	ofstream out(pathOut + "/csv_data.hpp" , ios::out);
+
+	// 文件头
+	out << "#pragma once" << endl;
+	out << endl;
+	out << "// Total data management" << endl;
+	out << "// Warning:This file is auto generated.Do not manually change it." << endl;
+	out << "// Usage:First \"Load\" then \"Use\"." << endl;
+	out << "// File name rule:csv lowercase;xml lowercase;hpp uppercase." << endl;
+	out << "// Load param: The parent path of the csv. File will automatically load the csv file of the same name." << endl;
+	out << endl;
+	out << "#include <iostream>" << endl;
+	for (vector<string>::iterator it = files.begin(); it != files.end(); ++it)
+		out << "#include \"" << NAP::FileReader::FilenameGet(*it) << ".hpp\"" << endl;
+	out << endl;
+
+	// 管理类
+	out << "class CSVDataMgr" << endl;
+	out << "{" << endl;
+	out << "public:" << endl;
+	out << "\tstatic bool Load(std::string path);" << endl;
+	out << "};" << endl;
+	out << endl;
+
+	// 管理类 实现
+	out << "bool CSVDataMgr::Load(std::string path)" << endl;
+	out << "{" << endl;
+	for (vector<string>::iterator it = files.begin(); it != files.end(); ++it)
+	{
+		className = _ClassToMgr(_FileToClass(NAP::FileReader::FilenameGet(*it)));
+		out << "\tif (!" << className << "::getInstance()->Load(path)) { return false; }" << endl;
+	}
+	out << "\treturn true;" << endl;
+	out << "}" << endl;
+
 	return true;
 }
 
@@ -256,4 +291,10 @@ std::string DataAnalyzer::_NameToMember(std::string name)
 std::string DataAnalyzer::_ClassToMgr(std::string className)
 {
 	return (className + "Mgr");
+}
+
+std::string DataAnalyzer::_FileToClass(std::string fileName)
+{
+	((char*)fileName.c_str())[0] = toupper(((char*)fileName.c_str())[0]); // 类名首字母大写
+	return fileName;
 }
