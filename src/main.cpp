@@ -1,7 +1,5 @@
 ﻿#include <iostream>
 #include "config.h"
-#include "module.h"
-#include "tale.h"
 
 int main()
 {
