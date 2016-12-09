@@ -48,6 +48,9 @@ namespace NAP
 		template<typename T> bool Read(T& t) {}
 
 	private:
+		void Analyze(std::string& data, std::string& value);
+
+	private:
 		int m_curRow; // 当前读取行
 		int m_curCol; // 当前读取列
 
@@ -62,7 +65,11 @@ namespace NAP
 			CSVReader_BUFF_LENGTH = 255, // 每行数据读取长度
 		};
 	};
-
+	/*
+		列表		,"1,2,3"
+		结构体	,"(1,2)"
+		结构体列表	,"(1,2),(3,4)"
+	*/
 	bool CSVReader::Init(std::string path)
 	{
 		using namespace std;
@@ -96,8 +103,7 @@ namespace NAP
 			{
 				if ((m_numRow != 0) && (col >= m_numCol)) // 第一行的列数为整个文档的最大列数
 					break;
-				value = data.substr(0, pos);
-				data = data.substr(pos + 1);
+				Analyze(data, value);
 				if (m_numRow != 0) // 第一行不记录数据
 				{
 					if (col == 0)
@@ -129,6 +135,42 @@ namespace NAP
 
 		in.close();
 		return true;
+	}
+
+	void CSVReader::Analyze(std::string& data, std::string& value)
+	{
+		size_t pos1 = data.find_first_of(",");
+		if (pos1 == std::string::npos) // 无剩余数据
+		{
+			value = data;
+			data = "";
+			return;
+		}
+		size_t pos2 = data.find_first_of("\"");
+		if (pos2 == std::string::npos) // 无复合数据
+		{
+			value = data.substr(0, pos1);
+			data = data.substr(pos1 + 1);
+			return;
+		}
+		if (pos2 >= pos1)	// 当前字段无复合数据
+		{
+			value = data.substr(0, pos1);
+			data = data.substr(pos1 + 1);
+			return;
+		}
+		size_t pos3 = data.find("\"", pos2 + 1);
+		if (pos3 == std::string::npos) // "数量不匹配,数据错误
+		{
+			value = data.substr(0, pos1);
+			data = data.substr(pos1 + 1);
+			return;
+		}
+		value = data.substr(pos2 + 1, pos3 - pos2 - 1); // 截取,之间的"之间的字符串
+		if (data.length() >= (pos3 + 1 + 1))
+			data = data.substr(pos3 + 1 + 1); // 这里要过掉下一个,
+		else
+			data = "";
 	}
 
 	template<>

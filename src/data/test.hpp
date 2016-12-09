@@ -8,6 +8,7 @@
 
 #include <iostream>
 #include <map>
+#include <string>
 #include "csv_reader/csv_reader.hpp"
 
 struct Test

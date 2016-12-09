@@ -1,5 +1,6 @@
 ﻿#include <iostream>
 #include <fstream>
+#include <set>
 #include "data_analyzer.h"
 #include "tinyxml/tinyxml.h"
 #include "ini_reader/ini_reader.hpp"
@@ -9,6 +10,24 @@
 int main()
 {
 	using namespace std;
+
+	//TODO:PJ 这里是测试用代码
+	//NAP::CSVReader csv;
+	//if (!csv.Init("../../data/story.csv"))
+	//	return 0;
+	//int size = csv.Row();
+	//int col = csv.Col();
+	//string data;
+	//for (int i = 0; i < size; ++i)
+	//{
+	//	for (int j = 0; j < col; ++j)
+	//	{
+	//		csv.Read(data);
+	//		cout << "(" << i << "," << j << ")\t" << data << endl;
+	//	}
+	//	csv.Next();
+	//}
+	//return 0;
 
 	DataAnalyzer analyzer("config.ini");
 	if (!analyzer.Analyze())
@@ -44,6 +63,9 @@ bool DataAnalyzer::Analyze()
 	string classKeyType; // 管理类索引类型
 	string classKeyValue; // 管理类索引值
 	bool flag; // 临时标记
+	set<string> includeType; // 头文件包含
+	string attrType;
+	string includeFile;
 	for (vector<string>::iterator it = files.begin(); it != files.end(); ++it)
 	{
 		pathXml = pathIn + "/" + (*it);
@@ -57,6 +79,7 @@ bool DataAnalyzer::Analyze()
 		pathHpp = pathOut + "/" + fileName + ".hpp";
 		classKeyType = "";
 		classKeyValue = "";
+		includeType.clear();
 
 		// 读取/写入文件
 		TiXmlDocument doc;
@@ -82,6 +105,17 @@ bool DataAnalyzer::Analyze()
 		out << endl;
 		out << "#include <iostream>" << endl;
 		out << "#include <map>" << endl;
+		for (TiXmlElement* node = root->FirstChildElement(); node != NULL; node = node->NextSiblingElement())
+		{
+			attrType = node->Attribute("type");
+			if (includeType.find(attrType) != includeType.end())
+				continue;
+			includeFile = _TypeToHeader(attrType);
+			if (includeFile == "")
+				continue;
+			includeType.insert(attrType);
+			out << "#include <" << includeFile << ">" << endl;
+		}
 		out << "#include \"csv_reader/csv_reader.hpp\"" << endl;
 		out << endl;
 
@@ -106,7 +140,7 @@ bool DataAnalyzer::Analyze()
 				classKeyType = node->Attribute("type");
 				classKeyValue = _NameToMember(node->Attribute("name"));
 			}
-			out << "\t" << _TypeToSTD(node->Attribute("type")) << " " << _NameToMember(node->Attribute("name")) << "; // " << node->Attribute("comment") << endl;
+			out << "\t" << _TypeToSTD(node->Attribute("type"), node) << " " << _NameToMember(node->Attribute("name")) << "; // " << node->Attribute("comment") << endl;
 		}
 
 		// 类结束	1
@@ -267,10 +301,37 @@ bool DataAnalyzer::Analyze()
 	return true;
 }
 
-std::string DataAnalyzer::_TypeToSTD(std::string type)
+std::string DataAnalyzer::_TypeToHeader(std::string type)
+{
+	if (type == "string")
+		return "string";
+	else if (type == "array")
+		return "vector";
+	return "";
+}
+
+std::string DataAnalyzer::_TypeToSTD(std::string type, TiXmlElement* node)
 {
 	if (type == "string")
 		return "std::string";
+	else if (type == "array")
+	{
+		if (!node)
+			return "array";
+		TiXmlElement* sub = node->FirstChildElement();
+		if (!sub)
+			return "array";
+		return "std::vector<" + _TypeToSTD(sub->Attribute("type"), node) + ">";
+	}
+	else if (type == "object")
+	{
+		if (!node)
+			return "object";
+		TiXmlElement* sub = node->FirstChildElement();
+		if (!sub)
+			return "object";
+		return sub->Attribute("name");
+	}
 	else
 		return type;
 }

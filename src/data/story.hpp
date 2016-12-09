@@ -8,6 +8,8 @@
 
 #include <iostream>
 #include <map>
+#include <string>
+#include <vector>
 #include "csv_reader/csv_reader.hpp"
 
 struct Story
@@ -20,6 +22,9 @@ public: // method
 public: // attribute
 	int m_id; // 索引
 	std::string m_message; // 对话
+	array m_vec; // 测试列表
+	Test m_stu; // 测试结构
+	std::vector<Test> m_stuvec; // 测试结构列表
 };
 
 class StoryMgr
@@ -47,7 +52,10 @@ private: // attribute
 
 Story::Story() :
 	m_id(0),
-	m_message("")
+	m_message(""),
+	m_vec(0),
+	m_stu(0),
+	m_stuvec(0)
 {
 }
 
@@ -60,6 +68,9 @@ void Story::Show(std::string prefix) const
 {
 	std::cout << prefix << "m_id:" << m_id << std::endl;
 	std::cout << prefix << "m_message:" << m_message << std::endl;
+	std::cout << prefix << "m_vec:" << m_vec << std::endl;
+	std::cout << prefix << "m_stu:" << m_stu << std::endl;
+	std::cout << prefix << "m_stuvec:" << m_stuvec << std::endl;
 }
 
 StoryMgr* StoryMgr::getInstance()
@@ -81,6 +92,9 @@ bool StoryMgr::Load(std::string path)
 	{
 		csv.Read(data.m_id);
 		csv.Read(data.m_message);
+		csv.Read(data.m_vec);
+		csv.Read(data.m_stu);
+		csv.Read(data.m_stuvec);
 		csv.Next();
 		m_data[data.m_id] = data;
 	}

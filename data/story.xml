@@ -1,4 +1,17 @@
 ﻿<row comment="主体">
 	<col type="int" name="id" comment="索引" />
 	<col type="string" name="message" comment="对话" />
+	<col type="array" template="int" name="vec" comment="测试列表" />
+	<col type="object" name="stu" comment="测试结构">
+		<col type="object" name="Test" comment="测试结构">
+			<data type="int" name="param1" comment="参数1" />
+			<data type="string" name="param2" comment="参数2" />
+		</col>
+	</col>
+	<col type="array" name="stuvec" comment="测试结构列表">
+		<col type="object" name="Test" comment="测试结构">
+			<data type="int" name="s1" comment="参数1" />
+			<data type="string" name="s2" comment="参数2" />
+		</col>
+	</col>
 </row>
