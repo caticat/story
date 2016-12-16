@@ -1,0 +1,13 @@
+﻿<def comm="结构体定义">
+	<test1 comm="测试结构1">
+		<int name="p1" comm="参数1" />
+		<str name="p2" comm="参数2" />
+	</test1>
+	<test2 comm="测试结构2">
+		<int name="p1" comm="参数1" />
+		<obj name="p2" comm="参数2" type="test1" />
+		<arr name="p3" comm="参数3" type="test1" />
+		<arr name="p4" comm="参数4" type="int" />
+		<arr name="p5" comm="参数5" type="str" />
+	</test2>
+</def>

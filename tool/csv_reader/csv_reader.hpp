@@ -31,6 +31,7 @@
 #include <vector>
 #include <fstream>
 #include <iostream>
+#include <sstream>
 
 namespace NAP
 {
@@ -49,6 +50,7 @@ namespace NAP
 
 	private:
 		void Analyze(std::string& data, std::string& value);
+		void ToVec(std::string str, std::vector<std::string>& vec); // 只分割一层
 
 	private:
 		int m_curRow; // 当前读取行
@@ -70,7 +72,7 @@ namespace NAP
 		结构体	,"(1,2)"
 		结构体列表	,"(1,2),(3,4)"
 	*/
-	bool CSVReader::Init(std::string path)
+	inline bool CSVReader::Init(std::string path)
 	{
 		using namespace std;
 		ifstream in(path, ios::in);
@@ -137,7 +139,7 @@ namespace NAP
 		return true;
 	}
 
-	void CSVReader::Analyze(std::string& data, std::string& value)
+	inline void CSVReader::Analyze(std::string& data, std::string& value)
 	{
 		size_t pos1 = data.find_first_of(",");
 		if (pos1 == std::string::npos) // 无剩余数据
@@ -173,8 +175,45 @@ namespace NAP
 			data = "";
 	}
 
+	inline void CSVReader::ToVec(std::string str, std::vector<std::string>& vec)
+	{
+		vec.clear();
+		bool isFront = true;
+		bool isMulti = false;
+		int deep = 0;
+		int size = str.length();
+		const char* cstr = str.c_str();
+		std::stringstream ss;
+		for (int i = 0; i < size; ++i)
+		{
+			if ((cstr[i] == '(') || (cstr[i] == '['))
+			{
+				++deep;
+				isMulti = true;
+			}
+			else if ((cstr[i] == ')') || (cstr[i] == ']'))
+				--deep;
+			if (isFront)
+			{
+				isFront = false;
+				if ((cstr[i] == '(') || (cstr[i] == '['))
+					continue;
+			}
+			if ((deep == 1) && (cstr[i] == ','))
+			{
+				vec.push_back(ss.str());
+				ss.clear();
+				ss.str("");
+			}
+			else if (isMulti && ((i + 1) == size))
+				vec.push_back(ss.str());
+			else
+				ss << cstr[i];
+		}
+	}
+
 	template<>
-	bool CSVReader::Read(int& t)
+	inline bool CSVReader::Read(int& t)
 	{
 		if ((m_curCol >= m_numCol) || (m_curRow >= m_numRow))
 			return false;
@@ -183,11 +222,46 @@ namespace NAP
 	}
 
 	template<>
-	bool CSVReader::Read(std::string& t)
+	inline bool CSVReader::Read(std::string& t)
 	{
 		if ((m_curCol >= m_numCol) || (m_curRow >= m_numRow))
 			return false;
 		t = m_data[m_curRow][m_curCol++].c_str();
+		return true;
+	}
+
+	template<>
+	inline bool CSVReader::Read(std::vector<int>& t)
+	{
+		if ((m_curCol >= m_numCol) || (m_curRow >= m_numRow))
+			return false;
+		t.clear();
+		std::string data = m_data[m_curRow][m_curCol++];
+		if (data.front() != '[')
+			return false;
+		if (data.back() != ']')
+			return false;
+		data = data.substr(1);
+		data = data.substr(0, data.length() - 1);
+		size_t pos;
+		while ((pos = data.find(",")) != std::string::npos)
+		{
+			t.push_back(atoi(data.substr(0, pos).c_str()));
+			data = data.substr(pos + 1);
+		}
+		if (data.length() > 0)
+			t.push_back(atoi(data.c_str()));
+		return true;
+	}
+
+	template<>
+	inline bool CSVReader::Read(std::vector<std::string>& t)
+	{
+		if ((m_curCol >= m_numCol) || (m_curRow >= m_numRow))
+			return false;
+		t.clear();
+		std::string data = m_data[m_curRow][m_curCol++];
+		ToVec(data, t);
 		return true;
 	}
 }

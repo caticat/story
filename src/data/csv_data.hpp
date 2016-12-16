@@ -1,10 +1,8 @@
 #pragma once
 
-// Total data management
-// Warning:This file is auto generated.Do not manually change it.
-// Usage:First "Load" then "Use".
-// File name rule:csv lowercase;xml lowercase;hpp uppercase.
-// Load param: The parent path of the csv. File will automatically load the csv file of the same name.
+/**
+ * 总体数据管理类
+ */
 
 #include <iostream>
 #include "story.hpp"

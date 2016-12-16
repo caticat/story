@@ -1,4 +1,4 @@
-﻿<row comment="测试文件">
-	<col type="int" name="id" comment="索引" />
-	<col type="string" name="test" comment="测试数据" />
-</row>
+﻿<obj comm="测试类">
+	<int name="id" comm="索引" />
+	<str name="test" comm="测试数据test" />
+</obj>
