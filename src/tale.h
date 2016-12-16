@@ -9,6 +9,12 @@ public:
 	~Tale();
 public:
 	void TestEvent(const Event*);
+	void EventExit(const Event*); // 退出事件
+
 public:
-	int m_a;
+	// 接口
+	void Run();
+
+private:
+	bool m_run;
 };

@@ -45,7 +45,6 @@ void EventMgr::Unreg(IEvent* ptr)
 
 void EventMgr::Trigger(int eventId, Event* pEvent)
 {
-	CONFIRM(pEvent);
 	std::map<int, std::list<EventFunction> >::iterator it = m_data.find(eventId);
 	if (it == m_data.end())
 		return;
@@ -59,6 +58,31 @@ void EventMgr::Trigger(int eventId, Event* pEvent)
 		(itef->m_ptr->*(itef->m_fun))(pEvent);
 		++itef;
 	}
+}
+
+/************************************************************************/
+/* 命令                                                                  */
+/************************************************************************/
+
+CommandMgr::CommandMgr() :
+	m_eventMgr(*EventMgr::getInstance())
+{
+	m_prefix = '@';
+	m_command.insert(std::make_pair("exit", EventMgr::EVENT_COMMAND_EXIT));
+	m_command.insert(std::make_pair("quit", EventMgr::EVENT_COMMAND_EXIT));
+}
+
+bool CommandMgr::TestCommand(const std::string& command)
+{
+	// 条件校验
+	if (command.empty() || (command.at(0) != m_prefix))
+		return false;
+
+	std::map<std::string, int>::const_iterator it = m_command.find(command.substr(1));
+	if (it != m_command.end())
+		m_eventMgr.Trigger(it->second, NULL);
+
+	return true;
 }
 
 /************************************************************************/

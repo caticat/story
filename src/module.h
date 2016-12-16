@@ -62,6 +62,7 @@ public:
 	enum
 	{
 		EVENT_TEST = 1, // 测试事件
+		EVENT_COMMAND_EXIT = 2, // 命令 退出
 
 		EVENT_MAX, // 最大值
 	};
@@ -73,6 +74,25 @@ public:
 
 private:
 	std::map<int, std::list<EventFunction> > m_data; // 事件列表<事件id,注册函数列表>
+};
+
+/************************************************************************/
+/* 命令                                                                  */
+/************************************************************************/
+
+class CommandMgr
+{
+	CommandMgr();
+	SINGLETON_GETINSTANCE(CommandMgr);
+
+public:
+	bool TestCommand(const std::string& command); // 以命令方式尝试运行
+
+private:
+	EventMgr& m_eventMgr; // 事件
+private:
+	char m_prefix; // 命令前缀
+	std::map<std::string, int> m_command; // <命令, 事件id>
 };
 
 /************************************************************************/
