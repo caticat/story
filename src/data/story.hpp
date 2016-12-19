@@ -21,10 +21,8 @@ public: // method
 public: // attribute
 	int m_id; // 索引
 	std::string m_message; // 对话
-	std::vector<int> m_vec_i; // 测试列表
-	std::vector<std::string> m_vec_s; // 测试列表
-	Test1 m_stu; // 测试结构
-	std::vector<Test1> m_stuvec; // 测试结构列表
+	std::vector<KeyGo> m_go; // 选项跳转
+	int m_end; // 结束标记
 };
 
 class StoryMgr
@@ -51,7 +49,8 @@ private: // attribute
 
 inline Story::Story() :
 	m_id(0),
-	m_message("")
+	m_message(""),
+	m_end(0)
 {
 }
 
@@ -64,6 +63,7 @@ inline void Story::Show(std::string prefix) const
 {
 	std::cout << prefix << "m_id:" << m_id << std::endl;
 	std::cout << prefix << "m_message:" << m_message << std::endl;
+	std::cout << prefix << "m_end:" << m_end << std::endl;
 }
 
 inline StoryMgr* StoryMgr::getInstance()
@@ -79,7 +79,7 @@ inline bool StoryMgr::Load(std::string path)
 	NAP::CSVReader csv;
 	if (!csv.Init(path + "/story.csv"))
 		return false;
-	int size = csv.Col();
+	int size = csv.Row();
 	Story data;
 	std::vector<std::string> svec;
 	std::vector<std::string> svecIn;
@@ -87,10 +87,8 @@ inline bool StoryMgr::Load(std::string path)
 	{
 		csv.Read(data.m_id);
 		csv.Read(data.m_message);
-		csv.Read(data.m_vec_i);
-		csv.Read(data.m_vec_s);
-		csv.Read(svec); data.m_stu.Read(svec);
-		csv.Read(svec); { Test1 tmp; for (std::vector<std::string>::const_iterator it = svec.begin(); it != svec.end(); ++it) { tmp.ToVec(*it, svecIn); tmp.Read(svecIn); data.m_stuvec.push_back(tmp); } }
+		csv.Read(svec); { KeyGo tmp; data.m_go.clear(); for (std::vector<std::string>::const_iterator it = svec.begin(); it != svec.end(); ++it) { tmp.ToVec(*it, svecIn); tmp.Read(svecIn); data.m_go.push_back(tmp); } }
+		csv.Read(data.m_end);
 		csv.Next();
 		m_data[data.m_id] = data;
 	}

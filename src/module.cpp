@@ -2,6 +2,7 @@
 #include "def_const.h"
 #include "util.hpp"
 #include <fstream>
+#include <iostream>
 
 /************************************************************************/
 /* 事件                                                                  */
@@ -70,19 +71,73 @@ CommandMgr::CommandMgr() :
 	m_prefix = '@';
 	m_command.insert(std::make_pair("exit", EventMgr::EVENT_COMMAND_EXIT));
 	m_command.insert(std::make_pair("quit", EventMgr::EVENT_COMMAND_EXIT));
+	m_command.insert(std::make_pair("new", EventMgr::EVENT_COMMAND_NEW));
+	m_command.insert(std::make_pair("load", EventMgr::EVENT_COMMAND_LOAD));
+	m_command.insert(std::make_pair("save", EventMgr::EVENT_COMMAND_SAVE));
 }
 
-bool CommandMgr::TestCommand(const std::string& command)
+bool CommandMgr::TestCommand(std::string command)
 {
 	// 条件校验
 	if (command.empty() || (command.at(0) != m_prefix))
 		return false;
 
-	std::map<std::string, int>::const_iterator it = m_command.find(command.substr(1));
+	std::map<std::string, int>::const_iterator it = m_command.find(_SplitCommand(command.substr(1)));
 	if (it != m_command.end())
-		m_eventMgr.Trigger(it->second, NULL);
+		m_eventMgr.Trigger(it->second, &EventCommand(m_param));
+	else
+		std::cerr << "Invalid Command" << std::endl;
 
 	return true;
+}
+
+std::string CommandMgr::_SplitCommand(std::string command)
+{
+	// 命令格式:@命令 参数1 参数2 "参数3 参数3" 参数4
+
+	m_param.clear();
+
+	if (command.empty())
+		return "";
+
+	std::string ret = "";
+	bool isStr = false;
+	int len = command.length();
+	std::stringstream ss;
+	const char* c = command.c_str();
+	for (int i = 0; i < len; ++i)
+	{
+		if (c[i] == '\"')
+		{
+			isStr = !isStr;
+		}
+		else
+		{
+			if ((!isStr) && (c[i] == ' '))
+			{
+				if (ret.empty())
+					ret = ss.str();
+				else
+					m_param.push_back(ss.str());
+				ss.clear();
+				ss.str("");
+			}
+			else if ((i + 1) == len)
+			{
+				ss << c[i];
+				if (ret.empty())
+					ret = ss.str();
+				else
+					m_param.push_back(ss.str());
+				ss.clear();
+				ss.str("");
+			}
+			else
+				ss << c[i];
+		}
+	}
+
+	return ret;
 }
 
 /************************************************************************/
@@ -135,7 +190,7 @@ void SaveDataG::SetV1(Json::Value& root)
 	m_test = root["test"].asString();
 }
 
-SaveDataP::SaveDataP() : ISave(), m_name("")
+SaveDataP::SaveDataP() : ISave(), m_step(0)
 {
 	m_versionLoad.insert(std::make_pair(ISave_V1, ISavePtrFun((ISave*)this, (save_fun_t)&SaveDataP::SetV1)));
 }
@@ -143,7 +198,7 @@ SaveDataP::SaveDataP() : ISave(), m_name("")
 void SaveDataP::Reset()
 {
 	m_version = ISave_VMax - 1;
-	m_name = "";
+	m_step = 0;
 }
 
 std::string SaveDataP::Get() const
@@ -153,7 +208,7 @@ std::string SaveDataP::Get() const
 	Value root;
 
 	root["version"] = ISave_VMax - 1; // 保存永远是最大版本号
-	root["name"] = m_name;
+	root["step"] = m_step;
 
 	return root.toStyledString();
 }
@@ -178,7 +233,7 @@ void SaveDataP::Set(std::string json)
 
 void SaveDataP::SetV1(Json::Value& root)
 {
-	m_name = root["name"].asString();
+	m_step = root["step"].asInt();
 }
 
 ArchiveMgr::ArchiveMgr() : m_name(""),

@@ -10,4 +10,9 @@
 		<arr name="p4" comm="参数4" type="int" />
 		<arr name="p5" comm="参数5" type="str" />
 	</test2>
+	<keyGo comm="跳转选项">
+		<int name="key" comm="选项" />
+		<int name="goto" comm="跳转" />
+		<str name="message" comm="文本" />
+	</keyGo>
 </def>

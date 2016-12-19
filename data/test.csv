@@ -1,6 +1,4 @@
-id,test
-1,e
-2,d
-3,c
-4,b
-5,a
+tint,tstr,tobj,tarrint,tarrstr,tarrobj
+11,ee,"(11,ee)","[11,22,33]","[aa,bb,cc]","[(11,ee),(22,dd),(33,cc)]"
+22,dd,"(22,dd)","[44,55,66]","[dd,ee,ff]","[(44,ff),(55,ee),(66,dd)]"
+33,cc,"(33,cc)","[77,88,99]","[gg,hh,ii]","[(77,gg),(88,ff),(99,ee)]"

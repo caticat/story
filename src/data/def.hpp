@@ -35,6 +35,16 @@ struct Test2 : public IREAD
 	void Read(const std::vector<std::string>&);
 };
 
+// 跳转选项
+struct KeyGo : public IREAD
+{
+	int m_key; // 选项
+	int m_goto; // 跳转
+	std::string m_message; // 文本
+
+	void Read(const std::vector<std::string>&);
+};
+
 /************************************************************************/
 /* implementation                                                       */
 /************************************************************************/
@@ -93,5 +103,14 @@ inline void Test2::Read(const std::vector<std::string>& vec)
 	if (idxVec < sizeVec) { std::vector<std::string> data, dataIn; ToVec(vec[idxVec++], data); Test1 tmp; m_p3.clear(); for (std::vector<std::string>::const_iterator it = data.begin(); it != data.end(); ++it) { ToVec(*it, dataIn); tmp.Read(dataIn); m_p3.push_back(tmp); } }
 	if (idxVec < sizeVec) { std::vector<std::string> data; ToVec(vec[idxVec++], data); m_p4.clear(); for (std::vector<std::string>::const_iterator it = data.begin(); it != data.end(); ++it) { m_p4.push_back(atoi(it->c_str())); } }
 	if (idxVec < sizeVec) { ToVec(vec[idxVec++], m_p5); }
+}
+
+inline void KeyGo::Read(const std::vector<std::string>& vec)
+{
+	int sizeVec = vec.size();
+	int idxVec = 0;
+	if (idxVec < sizeVec) { m_key = atoi(vec[idxVec++].c_str()); }
+	if (idxVec < sizeVec) { m_goto = atoi(vec[idxVec++].c_str()); }
+	if (idxVec < sizeVec) { m_message = vec[idxVec++]; }
 }
 

@@ -20,6 +20,8 @@ A csv-based independent cli game frame.
 - [x] 事件机制
 - [x] 数据存储支持
 - [x] 表解析高级功能支持(array,struct,array_struct)
+- [x] 基本命令支持
+- [x] 基本流程控制支持
 
 ## 文件夹说明
 - /data	数据配置文件
@@ -36,3 +38,6 @@ A csv-based independent cli game frame.
 	- /ini_reader	ini文件解析工具
 - config.ini	配置文件
 
+## 简介
+已经能完成多线纯流程故事,
+暂时没有其他数据用于记录.

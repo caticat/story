@@ -23,6 +23,7 @@
 		析构函数取消注册(不取消会出问题)
 */
 
+// 事件注册/卸载/参数转换标准宏
 #define EVENT_REG(ID,FUN) EventMgr::getInstance()->Reg(ID, EventFunction((IEvent*)this, (event_fun_t)&FUN));
 #define EVENT_UNREG() EventMgr::getInstance()->Unreg(this);
 #define EVENT_PARAM(T,O,I) const T& O = *((T*)I);
@@ -38,6 +39,13 @@ struct EventTest : public Event // 测试事件
 	std::string m_str2;
 
 	EventTest(): Event(), m_str1(""), m_str2("") {}
+};
+
+struct EventCommand : public Event // 命令事件
+{
+	const std::vector<std::string>& m_param;
+
+	EventCommand(const std::vector<std::string>& param) : m_param(param) {}
 };
 
 class IEvent // 函数接口
@@ -63,6 +71,9 @@ public:
 	{
 		EVENT_TEST = 1, // 测试事件
 		EVENT_COMMAND_EXIT = 2, // 命令 退出
+		EVENT_COMMAND_NEW = 3, // 命令 新游戏
+		EVENT_COMMAND_LOAD = 4, // 命令 读取
+		EVENT_COMMAND_SAVE = 5, // 命令 保存
 
 		EVENT_MAX, // 最大值
 	};
@@ -86,8 +97,13 @@ class CommandMgr
 	SINGLETON_GETINSTANCE(CommandMgr);
 
 public:
-	bool TestCommand(const std::string& command); // 以命令方式尝试运行
+	bool TestCommand(std::string command); // 以命令方式尝试运行
 
+private:
+	std::string _SplitCommand(std::string command); // 拆分命令
+
+private:
+	std::vector<std::string> m_param; // 参数列表
 private:
 	EventMgr& m_eventMgr; // 事件
 private:
@@ -152,7 +168,7 @@ protected:
 struct SaveDataP : public ISave	// 独立数据
 {
 public:
-	std::string m_name;
+	int m_step;
 
 private:
 	enum

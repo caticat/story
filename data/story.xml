@@ -1,8 +1,6 @@
 ﻿<obj comm="主体">
 	<int name="id" comm="索引" />
 	<str name="message" comm="对话" />
-	<arr name="vec_i" comm="测试列表" type="int" />
-	<arr name="vec_s" comm="测试列表" type="str" />
-	<obj name="stu" comm="测试结构" type="test1" />
-	<arr name="stuvec" comm="测试结构列表" type="test1" />
+	<arr name="go" comm="选项跳转" type="keyGo" />
+	<int name="end" comm="结束标记" />
 </obj>

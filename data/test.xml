@@ -1,4 +1,8 @@
 ﻿<obj comm="测试类">
-	<int name="id" comm="索引" />
-	<str name="test" comm="测试数据test" />
+	<int name="tint" comm="数字" />
+	<str name="tstr" comm="字符串" />
+	<obj name="tobj" comm="对象" type="test1" />
+	<arr name="tarrint" comm="数组" type="int" />
+	<arr name="tarrstr" comm="数组字符串" type="str" />
+	<arr name="tarrobj" comm="数组对象" type="test1" />
 </obj>

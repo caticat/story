@@ -442,13 +442,13 @@ bool DataAnalyzer::_AnaObj(const std::vector<std::string>& files, std::string pa
 		out << _LinePrefix(deep) << "NAP::CSVReader csv;" << endl;
 		out << _LinePrefix(deep) << "if (!csv.Init(path + \"/" << fileName << ".csv\"))" << endl;
 		out << _LinePrefix(deep + 1) << "return false;" << endl;
-		out << _LinePrefix(deep) << "int size = csv.Col();" << endl;
+		out << _LinePrefix(deep) << "int size = csv.Row();" << endl;
 		out << _LinePrefix(deep) << className << " data;" << endl;
 		flag = false;
 		flagIn = false;
 		for (TiXmlElement* node = root->FirstChildElement(); node != NULL; node = node->NextSiblingElement())
 		{
-			if (node->Value() == XML_DEF_OBJ)
+			if ((node->Value() == XML_DEF_OBJ) || (node->Value() == XML_DEF_ARR))
 			{
 				flag = true;
 				out << _LinePrefix(deep) << "std::vector<std::string> svec;" << endl;
@@ -471,7 +471,7 @@ bool DataAnalyzer::_AnaObj(const std::vector<std::string>& files, std::string pa
 			if (stmp == XML_DEF_OBJ)
 				out << _LinePrefix(deep) << "csv.Read(svec); data." << _NameToMember(node->Attribute(XML_ATTR_NAME)) << "." << I_READ_FUN << "(svec);" << endl;
 			else if ((stmp == XML_DEF_ARR) && (subType = node->Attribute(XML_ATTR_TYPE)) && ((subType != XML_DEF_INT) && (subType != XML_DEF_STR) && (subType != XML_DEF_ARR))) // 不支持多维数组
-				out << _LinePrefix(deep) << "csv.Read(svec); { " << _FileToClass(subType) << " tmp; for (std::vector<std::string>::const_iterator it = svec.begin(); it != svec.end(); ++it) { tmp.ToVec(*it, svecIn); tmp." << I_READ_FUN << "(svecIn); data." << _NameToMember(node->Attribute(XML_ATTR_NAME)) << ".push_back(tmp); } }" << endl;
+				out << _LinePrefix(deep) << "csv.Read(svec); { " << _FileToClass(subType) << " tmp; data." << _NameToMember(node->Attribute(XML_ATTR_NAME)) << ".clear(); for (std::vector<std::string>::const_iterator it = svec.begin(); it != svec.end(); ++it) { tmp.ToVec(*it, svecIn); tmp." << I_READ_FUN << "(svecIn); data." << _NameToMember(node->Attribute(XML_ATTR_NAME)) << ".push_back(tmp); } }" << endl;
 			else
 				out << _LinePrefix(deep) << "csv.Read(data." << _NameToMember(node->Attribute(XML_ATTR_NAME)) << ");" << endl;
 		}
@@ -635,13 +635,12 @@ bool DataAnalyzer::_TypeInclude(std::string type, std::string subType, std::ofst
 		_TypeInclude(subType, "", out, inc);
 		return true;
 	}
-	else if (type == "obj")
+	else // obj
 	{
-		if (inc.find(type) != inc.end())
+		if (inc.find("obj") != inc.end())
 			return false;
+		inc.insert("obj");
 		out << "#include \"" << XML_DEF << ".hpp\"" << endl;
 		return true;
 	}
-	else
-		return false;
 }

@@ -8,6 +8,8 @@
 #include <map>
 #include "csv_reader/csv_reader.hpp"
 #include <string>
+#include "def.hpp"
+#include <vector>
 
 struct Test
 {
@@ -17,8 +19,12 @@ public: // method
 	void Show(std::string prefix = "") const;
 
 public: // attribute
-	int m_id; // 索引
-	std::string m_test; // 测试数据test
+	int m_tint; // 数字
+	std::string m_tstr; // 字符串
+	Test1 m_tobj; // 对象
+	std::vector<int> m_tarrint; // 数组
+	std::vector<std::string> m_tarrstr; // 数组字符串
+	std::vector<Test1> m_tarrobj; // 数组对象
 };
 
 class TestMgr
@@ -44,20 +50,20 @@ private: // attribute
 /************************************************************************/
 
 inline Test::Test() :
-	m_id(0),
-	m_test("")
+	m_tint(0),
+	m_tstr("")
 {
 }
 
 inline bool Test::Empty() const
 {
-	return (m_id == 0);
+	return (m_tint == 0);
 }
 
 inline void Test::Show(std::string prefix) const
 {
-	std::cout << prefix << "m_id:" << m_id << std::endl;
-	std::cout << prefix << "m_test:" << m_test << std::endl;
+	std::cout << prefix << "m_tint:" << m_tint << std::endl;
+	std::cout << prefix << "m_tstr:" << m_tstr << std::endl;
 }
 
 inline TestMgr* TestMgr::getInstance()
@@ -73,14 +79,20 @@ inline bool TestMgr::Load(std::string path)
 	NAP::CSVReader csv;
 	if (!csv.Init(path + "/test.csv"))
 		return false;
-	int size = csv.Col();
+	int size = csv.Row();
 	Test data;
+	std::vector<std::string> svec;
+	std::vector<std::string> svecIn;
 	for (int i = 0; i < size; ++i)
 	{
-		csv.Read(data.m_id);
-		csv.Read(data.m_test);
+		csv.Read(data.m_tint);
+		csv.Read(data.m_tstr);
+		csv.Read(svec); data.m_tobj.Read(svec);
+		csv.Read(data.m_tarrint);
+		csv.Read(data.m_tarrstr);
+		csv.Read(svec); { Test1 tmp; data.m_tarrobj.clear(); for (std::vector<std::string>::const_iterator it = svec.begin(); it != svec.end(); ++it) { tmp.ToVec(*it, svecIn); tmp.Read(svecIn); data.m_tarrobj.push_back(tmp); } }
 		csv.Next();
-		m_data[data.m_id] = data;
+		m_data[data.m_tint] = data;
 	}
 	return true;
 }
